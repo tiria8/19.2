@@ -63,14 +63,6 @@ class BlogUpdateView(UpdateView):
     model = Blog
     fields = ('title', 'description', 'preview', 'is_viewable')
 
-    def form_valid(self, form):
-        if form.is_valid():
-            new_blog = form.save()
-            new_blog_slug = slugify(new_blog.title)
-            new_blog.save()
-
-        return super().form_valid(form)
-
     def get_success_url(self):
         return reverse('catalog:blog', args=[self.kwargs.get('pk')])
 
