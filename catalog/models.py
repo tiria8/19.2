@@ -26,6 +26,13 @@ class Product(models.Model):
     created_at = models.DateField(default=date.today, verbose_name='дата создания')
     last_edited = models.DateField(default=date.today, verbose_name='дата последнего изменения')
 
+    def __str__(self):
+        return self.name
+
+    @property
+    def active_version(self):
+        return Version.objects.filter(is_active=True, product=self.id).first()
+
     class Meta:
         verbose_name = 'продукт'
         verbose_name_plural = 'продукты'
@@ -47,3 +54,16 @@ class Blog(models.Model):
         verbose_name = 'блог'
         verbose_name_plural = 'блоги'
 
+
+class Version(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='продукт')
+    version_number = models.IntegerField(default=1, verbose_name='номер версии')
+    version_title = models.CharField(max_length=150, verbose_name='название версии')
+    is_active = models.BooleanField(default=True, verbose_name='признак текущей версии')
+
+    def __str__(self):
+        return self.version_title
+
+    class Meta:
+        verbose_name = 'версия'
+        verbose_name_plural = 'версии'

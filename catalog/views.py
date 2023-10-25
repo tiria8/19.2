@@ -3,10 +3,12 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from pytils.translit import slugify
 
-from catalog.models import Product, Blog
+from catalog.forms import ProductForm, BlogForm, VersionForm
+from catalog.models import Product, Blog, Version
 
 
 class ProductsListView(ListView):
+
     model = Product
     extra_context = {
         'title': 'Магазин мебели'
@@ -19,7 +21,20 @@ class ProductDetailView(DetailView):
 
 class ProductCreateView(CreateView):
     model = Product
-    fields = ('name', 'description', 'product_image', 'category', 'price')
+    form_class = ProductForm
+    success_url = reverse_lazy('catalog:index')
+
+
+class ProductUpdateView(UpdateView):
+    model = Product
+    fields = ('name', 'description', 'product_image', 'category', 'price',)
+
+    def get_success_url(self):
+        return reverse('catalog:product', args=[self.kwargs.get('pk')])
+
+
+class ProductDeleteView(DeleteView):
+    model = Product
     success_url = reverse_lazy('catalog:index')
 
 
@@ -47,7 +62,7 @@ class BlogDetailView(DetailView):
 
 class BlogCreateView(CreateView):
     model = Blog
-    fields = ('title', 'description', 'preview', 'is_viewable')
+    form_class = BlogForm
     success_url = reverse_lazy('catalog:blogs')
 
     def form_valid(self, form):
@@ -70,6 +85,14 @@ class BlogUpdateView(UpdateView):
 class BlogDeleteView(DeleteView):
     model = Blog
     success_url = reverse_lazy('catalog:blogs')
+
+
+class VersionCreateView(CreateView):
+    model = Version
+    form_class = VersionForm
+
+    def get_success_url(self):
+        return reverse('catalog:product', args=[self.kwargs.get('pk')])
 
 
 def contacts(request):
