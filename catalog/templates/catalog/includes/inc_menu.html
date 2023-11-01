@@ -66,8 +66,10 @@
             <li><a href="{% url 'catalog:blogs' %}" class="text-white">Блог</a></li>
             {% if user.is_authenticated %}
               <li><a href="{% url 'users:logout' %}" class="text-white">Выйти из аккаунта</a></li>
+              <li><a href="{% url 'users:profile' %}" class="text-white">Мой аккаунт</a></li>
             {% else %}
               <li><a href="{% url 'users:login' %}" class="text-white">Войти в аккаунт</a></li>
+              <li><a href="{% url 'users:register' %}" class="text-white">Зарегистрироваться</a></li>
             {% endif %}
           </ul>
         </div>
