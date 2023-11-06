@@ -29,6 +29,7 @@ class Product(models.Model):
     last_edited = models.DateField(default=date.today, verbose_name='дата последнего изменения')
 
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, **NULLABLE, verbose_name='создатель')
+    is_published = models.BooleanField(default=False, verbose_name='опубликован')
 
     def __str__(self):
         return self.name
@@ -40,6 +41,21 @@ class Product(models.Model):
     class Meta:
         verbose_name = 'продукт'
         verbose_name_plural = 'продукты'
+
+        permissions = [
+            (
+                'set_published',
+                'Can publish posts'
+            ),
+            (
+                'change_category',
+                'can change category'
+            ),
+            (
+                'change_description',
+                'can change description'
+            )
+        ]
 
 
 class Blog(models.Model):

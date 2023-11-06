@@ -23,6 +23,17 @@ class ProductForm(forms.ModelForm):
         return cleaned_data
 
 
+class ProductModeratorForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ('description', 'category', 'is_published',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+
+
 class BlogForm(forms.ModelForm):
     class Meta:
         model = Blog

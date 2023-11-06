@@ -1,9 +1,11 @@
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from pytils.translit import slugify
 
-from catalog.forms import ProductForm, BlogForm, VersionForm
+from catalog.forms import ProductForm, BlogForm, VersionForm, ProductModeratorForm
 from catalog.models import Product, Blog, Version
 
 
@@ -34,7 +36,19 @@ class ProductCreateView(CreateView):
 
 class ProductUpdateView(UpdateView):
     model = Product
-    fields = ('name', 'description', 'product_image', 'category', 'price',)
+
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        if self.object.creator != self.request.user and not self.request.user.is_staff:
+            raise Http404
+
+        return self.object
+
+    def get_form_class(self):
+        if self.request.user.is_staff:
+            return ProductModeratorForm
+
+        return ProductForm
 
     def get_success_url(self):
         return reverse('catalog:product', args=[self.kwargs.get('pk')])
