@@ -34,18 +34,19 @@ class ProductCreateView(CreateView):
         return super().form_valid(form)
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(PermissionRequiredMixin, UpdateView):
     model = Product
+    permission_required = ["catalog.set_published", "catalog.change_category", "catalog.change_description"]
 
     def get_object(self, queryset=None):
         self.object = super().get_object(queryset)
-        if self.object.creator != self.request.user and not self.request.user.is_staff:
+        if self.object.creator != self.request.user and not self.request.user.has_perms(self.permission_required):
             raise Http404
 
         return self.object
 
     def get_form_class(self):
-        if self.request.user.is_staff:
+        if self.request.user.has_perms(self.permission_required):
             return ProductModeratorForm
 
         return ProductForm
