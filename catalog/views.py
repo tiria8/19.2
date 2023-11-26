@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.cache import cache
 from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
@@ -6,7 +7,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from pytils.translit import slugify
 
 from catalog.forms import ProductForm, BlogForm, VersionForm, ProductModeratorForm
-from catalog.models import Product, Blog, Version
+from catalog.models import Product, Blog, Version, Category
+from config import settings
 
 
 class ProductsListView(ListView):
@@ -129,3 +131,15 @@ def contacts(request):
     }
 
     return render(request, 'catalog/contacts.html', context)
+
+
+def get_cached_categories():
+    if settings.CACHE_ENABLED:
+        key = 'category_list'
+        category_list = cache.get(key)
+        if category_list is None:
+            category_list = Category.objects.all()
+            cache.set(key, category_list)
+            return category_list
+        return category_list
+
